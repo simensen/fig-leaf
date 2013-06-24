@@ -37,7 +37,7 @@ function transform(
 
 class TransformTest extends PHPUnit_Framework_TestCase
 {
-    public function test()
+    public function testClassName()
     {
         $expect = "/path/to/foo-bar/src/Baz/Qux.php";
         $actual = transform(
@@ -48,7 +48,10 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '.php'
         );
         $this->assertSame($expect, $actual);
-
+    }
+    
+    public function testResourceName()
+    {
         $expect = "/path/to/foo-bar/config/Baz/Qux.yml";
         $actual = transform(
             ':Foo:Bar:Baz:Qux',
@@ -58,8 +61,11 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '.yml'
         );
         $this->assertSame($expect, $actual);
-
-        $expect = "/path/to/foo-bar/resources/Baz/Qux/";
+    }
+    
+    public function testDirectoryName()
+    {
+        $expect = "/path/to/foo-bar/resources/Baz/Qux";
         $actual = transform(
             '/Foo/Bar/Baz/Qux',
             '/Foo/Bar',
@@ -67,8 +73,10 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '/path/to/foo-bar/resources'
         );
         $this->assertSame($expect, $actual);
-
-        // mapped prefix
+    }
+    
+    public function testBSPrefix()
+    {
         $expect = "/src/ShowController.php";
         $actual = transform(
             '\\Acme\\Blog\\ShowController.php',
@@ -77,8 +85,10 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '/src/'
         );
         $this->assertSame($expect, $actual);
-        
-        // mapped directory
+    }
+    
+    public function testBSDirectory()
+    {
         $expect = "/src/";
         $actual = transform(
             '\\Acme\\Blog',
@@ -87,8 +97,10 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '/src/'
         );
         $this->assertSame($expect, $actual);
-
-        // mapped file
+    }
+    
+    public function testBSFile()
+    {
         $expect = "/src/ShowController.php";
         $actual = transform(
             '\\Acme\\Blog\\ShowController.php',
@@ -97,8 +109,10 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '/src/ShowController.php'
         );
         $this->assertSame($expect, $actual);
-
-        // mapped root "\"
+    }
+    
+    public function testBSRoot()
+    {
         $expect = "/src/Acme/Blog/ShowController.php";
         $actual = transform(
             '\\Acme\\Blog\\ShowController.php',
