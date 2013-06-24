@@ -37,8 +37,10 @@ given a _logical separator_ of "/", a _fully qualified logical path_ of
 `/Foo/Bar/Baz/Qux`, and a _logical path prefix_ of `/Foo/Bar/`, then `Baz/Qux`
 is the _logical path suffix_.
 
-**File System Base Directory**: A directory in the file system associated with
-a _logical path prefix_.
+**File System Base Path**: A path in the file system associated with
+a _logical path prefix_. The _file system base path_ MAY end with a directory
+separator, thereby referring to a directory; or, it MAY NOT end with a
+directory separator, thereby indicating a file or a partial directory name.
 
 
 2. Specification
@@ -47,7 +49,7 @@ a _logical path prefix_.
 Given a fully qualified logical path, a logical path prefix, and a logical
 separator, implementations:
 
-- MUST replace the logical path prefix with a file system base directory
+- MUST replace the logical path prefix with a file system base path
   associated with that logical path prefix,
 
 - MUST replace logical path separators in the logical path suffix with
@@ -73,9 +75,9 @@ differ in how they are implemented.
  * Note that this is only an example, and is not a specification in itself.
  * 
  * @param string $logical_path The logical path to transform.
- * @param string $logical_prefix The logical prefix associated with $base_dir.
+ * @param string $logical_prefix The logical prefix associated with $base_path.
  * @param string $logical_sep The logical separator in the logical path.
- * @param string $base_dir The base directory for the transformation.
+ * @param string $base_path The base path for the transformation.
  * @param string $file_ext An optional file extension.
  * @return string The logical path transformed into a file system path.
  */
@@ -83,52 +85,19 @@ function transform(
     $logical_path,
     $logical_prefix,
     $logical_sep,
-    $base_dir,
+    $base_path,
     $file_ext = null
 ) {
     // make sure the logical prefix ends in a separator
     $logical_prefix = rtrim($logical_prefix, $logical_sep)
                     . $logical_sep;
     
-    // make sure the base directory ends in a separator
-    $base_dir = rtrim($base_dir, DIRECTORY_SEPARATOR)
-              . DIRECTORY_SEPARATOR;
-    
     // find the logical suffix 
     $logical_suffix = substr($logical_path, strlen($logical_prefix));
     
     // transform into a file system path
-    return $base_dir
+    return $base_path
          . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix)
          . $file_ext;
 }
-
-/**
- * Example transformations.
- */
-// "\Foo\Bar\Baz\Qux" => "/path/to/foo-bar/src/Baz/Qux.php"
-transform(
-    '\Foo\Bar\Baz\Qux',
-    '\Foo\Bar',
-    '\\',
-    '/path/to/foo-bar/src',
-    '.php'
-);
-
-// ":Foo:Bar:Baz:Qux" => "/path/to/foo-bar/config/Baz/Qux.yml"
-transform(
-    ':Foo:Bar:Baz:Qux',
-    ':Foo:Bar',
-    ':',
-    '/path/to/foo-bar/config',
-    '.yml'
-);
-
-// "/Foo/Bar/Baz/Qux/" => "/path/to/foo-bar/resources/Baz/Qux/"
-transform(
-    '/Foo/Bar/Baz/Qux',
-    '/Foo/Bar',
-    '/',
-    '/path/to/foo-bar/resources'
-);
 ```
