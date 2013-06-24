@@ -37,8 +37,8 @@ given a _logical separator_ of "/", a _fully qualified logical path_ of
 `/Foo/Bar/Baz/Qux`, and a _logical path prefix_ of `/Foo/Bar/`, then `Baz/Qux`
 is the _logical path suffix_.
 
-**File System Base Path**: A path in the file system associated with
-a _logical path prefix_. The _file system base path_ MAY end with a directory
+**File System Path Prefix**: A leading path in the file system associated with
+a _logical path prefix_. The _file system path prefix_ MAY end with a directory
 separator, thereby referring to a directory; or, it MAY NOT end with a
 directory separator, thereby indicating a file or a partial directory name.
 
@@ -49,7 +49,7 @@ directory separator, thereby indicating a file or a partial directory name.
 Given a fully qualified logical path, a logical path prefix, and a logical
 separator, implementations:
 
-- MUST replace the logical path prefix with a file system base path
+- MUST replace the logical path prefix with a file system path prefix
   associated with that logical path prefix,
 
 - MUST replace logical path separators in the logical path suffix with
@@ -75,9 +75,9 @@ differ in how they are implemented.
  * Note that this is only an example, and is not a specification in itself.
  * 
  * @param string $logical_path The logical path to transform.
- * @param string $logical_prefix The logical prefix associated with $base_path.
+ * @param string $logical_prefix The logical prefix associated with $fs_prefix.
  * @param string $logical_sep The logical separator in the logical path.
- * @param string $base_path The base path for the transformation.
+ * @param string $fs_prefix The file system path prefix for the transformation.
  * @param string $file_ext An optional file extension.
  * @return string The logical path transformed into a file system path.
  */
@@ -85,7 +85,7 @@ function transform(
     $logical_path,
     $logical_prefix,
     $logical_sep,
-    $base_path,
+    $fs_prefix,
     $file_ext = null
 ) {
     // make sure the logical prefix ends in a separator
@@ -96,7 +96,7 @@ function transform(
     $logical_suffix = substr($logical_path, strlen($logical_prefix));
     
     // transform into a file system path
-    return $base_path
+    return $fs_prefix
          . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix)
          . $file_ext;
 }
