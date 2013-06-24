@@ -46,11 +46,10 @@ directory separator, thereby indicating a file or a partial directory name.
 2. Specification
 ----------------
 
-Given a fully qualified logical path, a logical path prefix, and a logical
-separator, implementations:
+Given a fully qualified logical path, a logical path prefix, a logical
+separator, and a file system path prefix, implementations:
 
-- MUST replace the logical path prefix with a file system path prefix
-  associated with that logical path prefix, and
+- MUST replace the logical path prefix with the file system path prefix, and
 
 - MUST replace logical path separators in the logical path suffix with
   directory separators.
