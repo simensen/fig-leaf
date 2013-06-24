@@ -35,26 +35,12 @@ class TransformTest extends PHPUnit_Framework_TestCase
 {
     public function testClassName()
     {
-        $expect = "/path/to/foo-bar/src/Baz/Qux.php";
+        $expect = "/path/to/foo-bar/src/Baz/Qux";
         $actual = transform(
             '\Foo\Bar\Baz\Qux',
             '\Foo\Bar',
             '\\',
-            '/path/to/foo-bar/src/',
-            '.php'
-        );
-        $this->assertSame($expect, $actual);
-    }
-    
-    public function testResourceName()
-    {
-        $expect = "/path/to/foo-bar/config/Baz/Qux.yml";
-        $actual = transform(
-            ':Foo:Bar:Baz:Qux',
-            ':Foo:Bar',
-            ':',
-            '/path/to/foo-bar/config/',
-            '.yml'
+            '/path/to/foo-bar/src/'
         );
         $this->assertSame($expect, $actual);
     }
@@ -66,7 +52,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '/Foo/Bar/Baz/Qux',
             '/Foo/Bar',
             '/',
-            '/path/to/foo-bar/resources/'
+            '/path/to/foo-bar/resources/' // no trailing slash
         );
         $this->assertSame($expect, $actual);
     }
@@ -102,7 +88,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '\\Acme\\Blog\\ShowController.php',
             '\\Acme\\Blog\\ShowController.php',
             '\\',
-            '/src/ShowController.php'
+            '/src/ShowController.php' // no trailing slash
         );
         $this->assertSame($expect, $actual);
     }

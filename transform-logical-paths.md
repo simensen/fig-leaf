@@ -50,12 +50,10 @@ Given a fully qualified logical path, a logical path prefix, and a logical
 separator, implementations:
 
 - MUST replace the logical path prefix with a file system path prefix
-  associated with that logical path prefix,
+  associated with that logical path prefix, and
 
 - MUST replace logical path separators in the logical path suffix with
-  directory separators, and
-
-- MAY append a file name extension.
+  directory separators.
 
 The result is a file system path that MAY exist.
 
@@ -78,15 +76,13 @@ differ in how they are implemented.
  * @param string $logical_prefix The logical prefix associated with $fs_prefix.
  * @param string $logical_sep The logical separator in the logical path.
  * @param string $fs_prefix The file system path prefix for the transformation.
- * @param string $file_ext An optional file extension.
  * @return string The logical path transformed into a file system path.
  */
 function transform(
     $logical_path,
     $logical_prefix,
     $logical_sep,
-    $fs_prefix,
-    $file_ext = null
+    $fs_prefix
 ) {
     // make sure the logical prefix ends in a separator
     $logical_prefix = rtrim($logical_prefix, $logical_sep)
@@ -97,7 +93,6 @@ function transform(
     
     // transform into a file system path
     return $fs_prefix
-         . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix)
-         . $file_ext;
+         . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix);
 }
 ```
