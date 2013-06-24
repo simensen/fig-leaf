@@ -8,15 +8,13 @@
  * @param string $logical_prefix The logical prefix associated with $base_dir.
  * @param string $logical_sep The logical separator in the logical path.
  * @param string $base_dir The base directory for the transformation.
- * @param string $file_ext An optional file extension.
  * @return string The logical path transformed into a file system path.
  */
 function transform(
     $logical_path,
     $logical_prefix,
     $logical_sep,
-    $base_dir,
-    $file_ext = null
+    $base_dir
 ) {
     // make sure the logical prefix ends in a separator
     $logical_prefix = rtrim($logical_prefix, $logical_sep)
@@ -31,8 +29,7 @@ function transform(
     
     // transform into a file system path
     return $base_dir
-         . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix)
-         . $file_ext;
+         . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix);
 }
 
 class TransformTest extends PHPUnit_Framework_TestCase
@@ -41,11 +38,10 @@ class TransformTest extends PHPUnit_Framework_TestCase
     {
         $expect = "/path/to/foo-bar/src/Baz/Qux.php";
         $actual = transform(
-            '\Foo\Bar\Baz\Qux',
+            '\Foo\Bar\Baz\Qux.php',
             '\Foo\Bar',
             '\\',
-            '/path/to/foo-bar/src',
-            '.php'
+            '/path/to/foo-bar/src'
         );
         $this->assertSame($expect, $actual);
     }
@@ -54,11 +50,10 @@ class TransformTest extends PHPUnit_Framework_TestCase
     {
         $expect = "/path/to/foo-bar/config/Baz/Qux.yml";
         $actual = transform(
-            ':Foo:Bar:Baz:Qux',
+            ':Foo:Bar:Baz:Qux.yml',
             ':Foo:Bar',
             ':',
-            '/path/to/foo-bar/config',
-            '.yml'
+            '/path/to/foo-bar/config'
         );
         $this->assertSame($expect, $actual);
     }
