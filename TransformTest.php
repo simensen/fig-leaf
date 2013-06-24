@@ -39,6 +39,35 @@ class TransformTest extends PHPUnit_Framework_TestCase
 {
     public function test()
     {
+        $expect = "/path/to/foo-bar/src/Baz/Qux.php";
+        $actual = transform(
+            '\Foo\Bar\Baz\Qux',
+            '\Foo\Bar',
+            '\\',
+            '/path/to/foo-bar/src',
+            '.php'
+        );
+        $this->assertSame($expect, $actual);
+
+        $expect = "/path/to/foo-bar/config/Baz/Qux.yml";
+        $actual = transform(
+            ':Foo:Bar:Baz:Qux',
+            ':Foo:Bar',
+            ':',
+            '/path/to/foo-bar/config',
+            '.yml'
+        );
+        $this->assertSame($expect, $actual);
+
+        $expect = "/path/to/foo-bar/resources/Baz/Qux/";
+        $actual = transform(
+            '/Foo/Bar/Baz/Qux',
+            '/Foo/Bar',
+            '/',
+            '/path/to/foo-bar/resources'
+        );
+        $this->assertSame($expect, $actual);
+
         // mapped prefix
         $expect = "/src/ShowController.php";
         $actual = transform(
