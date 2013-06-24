@@ -15,8 +15,7 @@ function transform(
     $logical_path,
     $logical_prefix,
     $logical_sep,
-    $base_path,
-    $file_ext = null
+    $base_path
 ) {
     // make sure the logical prefix ends in a separator
     $logical_prefix = rtrim($logical_prefix, $logical_sep)
@@ -27,8 +26,7 @@ function transform(
     
     // transform into a file system path
     return $base_path
-         . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix)
-         . $file_ext;
+         . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix);
 }
 
 class TransformTest extends PHPUnit_Framework_TestCase
