@@ -23,18 +23,19 @@ more _logical segments_ delimited by _logical separators_. Given a _logical
 separator_ of "/", then `/`, `/Foo`, and `/Foo/Bar` are _fully
 qualified logical paths_.
 
-**Logical Path Prefix**: A _logical path prefix_ is any contiguous series of
-_logical separators_ and _logical segments_ at the beginning of a
-_fully qualified logical path_, terminating in a _logical separator_. For
-example, given a _logical separator_ of "/", then `/`, `/Foo/`, and `/Foo/Bar/`
-are _logical path prefixes_ for a _fully qualified logical path_ of
-`/Foo/Bar/Baz`.
+**Logical Path Prefix**: A string comprised of either a single _logical
+separator_, the _fully qualified logical path_, or any contiguous series of
+_logical separators_ and _logical segments_, starting from the beginning of a
+_fully qualified logical path_, that is followed by a _logical separator_. For
+example, given a _logical separator_ of "/" and a _fully qualified logical path_
+of `/Foo/Bar/Baz`, then `/`, `/Foo`, `/Foo/Bar`, `/Foo/Bar/Baz` are valid
+_logical path prefixes_.
 
 **Logical Path Suffix**: Given a _fully qualified logical path_ and a
 _logical path prefix_, the _logical path suffix_ is the remainder of the
 _fully qualified logical path_ after the _logical path prefix_. For example,
 given a _logical separator_ of "/", a _fully qualified logical path_ of
-`/Foo/Bar/Baz/Qux`, and a _logical path prefix_ of `/Foo/Bar/`, then `Baz/Qux`
+`/Foo/Bar/Baz/Qux`, and a _logical path prefix_ of `/Foo/Bar`, then `Baz/Qux`
 is the _logical path suffix_.
 
 **File System Path Prefix**: A leading path in the file system associated with
@@ -48,6 +49,12 @@ directory separator, thereby indicating a file or a partial directory name.
 
 Given a fully qualified logical path, a logical path prefix, a logical
 separator, and a file system path prefix, implementations:
+
+- If the logical path is equal to the logical path prefix, the algorithm MUST
+  return the file system path prefix.
+
+- If the logical path prefix is not valid or cannot be found, the algorithm MUST
+  return NULL.
 
 - MUST replace the logical path prefix with the file system path prefix, and
 
@@ -83,13 +90,25 @@ function transform(
     $logical_sep,
     $fs_prefix
 ) {
-    // make sure the logical prefix ends in a separator
-    $logical_prefix = rtrim($logical_prefix, $logical_sep)
-                    . $logical_sep;
-    
-    // find the logical suffix 
+    if ($logical_path === $logical_prefix) {
+        return $fs_prefix;
+    }
+
+    if ($logical_prefix !== $logical_sep ) {
+        // if the logical prefix is not the root then the logical prefix
+        // must have the logical separator appended to ensure that the
+        // logical prefix specified represented a valid logical path prefix
+        $logical_prefix = $logical_prefix . $logical_sep;
+    }
+
+    if ($logical_prefix !== substr($logical_path, 0, strlen($logical_prefix))) {
+        // ensure that partial matches will not be made
+        return null;
+    }
+
+    // find the logical suffix
     $logical_suffix = substr($logical_path, strlen($logical_prefix));
-    
+
     // transform into a file system path
     return $fs_prefix
          . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix);
