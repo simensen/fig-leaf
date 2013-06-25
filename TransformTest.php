@@ -26,7 +26,7 @@ function transform(
 
 class TransformTest extends PHPUnit_Framework_TestCase
 {
-    public function testFqlpIsSameAsLogialPathPrefix()
+    public function testFqlpIsSameAsLogicalPathPrefix()
     {
         $actual = transform(
             ':Foo:Bar',
@@ -36,6 +36,20 @@ class TransformTest extends PHPUnit_Framework_TestCase
         );
         
         $expect = '/path/to/foo-bar/src';
+        
+        $this->assertSame($expect, $actual);
+    }
+    
+    public function testLogicaPrefixIsRoot()
+    {
+        $actual = transform(
+            ':Foo:Bar',
+            ':',
+            ':',
+            '/'
+        );
+        
+        $expect = '/Foo/Bar';
         
         $this->assertSame($expect, $actual);
     }
