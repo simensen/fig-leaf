@@ -16,13 +16,12 @@ function transform(
     $logical_sep,
     $base_path
 ) {
+    // make sure the logical prefix ends in a logical separator
+    $logical_prefix = rtrim($logical_prefix, $logical_sep)
+                    . $logical_sep;
+                    
     // find the logical suffix 
     $logical_suffix = substr($logical_path, strlen($logical_prefix));
-    
-    if ($logical_prefix !== substr($logical_path, 0, strlen($logical_prefix))) {
-        // ensure that partial matches will not be made
-        return false;
-    }
     
     // transform into a file system path
     return $base_path
@@ -31,33 +30,7 @@ function transform(
 
 class TransformTest extends PHPUnit_Framework_TestCase
 {
-    public function testCannotTranformPartialLogicalPrefix()
-    {
-        $actual = transform(
-            ':Foo:Bar',
-            ':F',
-            ':',
-            '/path/to/foo-bar/src'
-        );
-        
-        $this->assertFalse($actual);
-    }
-    
-    public function testFqlpIsSameAsLogicalPathPrefix()
-    {
-        $actual = transform(
-            ':Foo:Bar',
-            ':Foo:Bar',
-            ':',
-            '/path/to/foo-bar/src'
-        );
-        
-        $expect = '/path/to/foo-bar/src';
-        
-        $this->assertSame($expect, $actual);
-    }
-    
-    public function testLogicaPrefixIsRoot()
+    public function testLogicalPrefixIsRoot()
     {
         $actual = transform(
             ':Foo:Bar',
@@ -76,7 +49,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
         $expect = "/path/to/foo-bar/srcBaz/Qux.php";
         $actual = transform(
             '\Foo\Bar\Baz\Qux',
-            '\Foo\Bar\\',
+            '\Foo\Bar',
             '\\',
             '/path/to/foo-bar/src'
         ) . '.php';
@@ -88,7 +61,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
         $expect = "/path/to/foo-bar/resources/Baz/Qux.yml";
         $actual = transform(
             ':Foo:Bar:Baz:Qux.yml',
-            ':Foo:Bar:',
+            ':Foo:Bar',
             ':',
             '/path/to/foo-bar/resources/'
         );
@@ -100,7 +73,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
         $expect = "/path/to/foo-bar/other/Baz/Qux";
         $actual = transform(
             '/Foo/Bar/Baz/Qux',
-            '/Foo/Bar/',
+            '/Foo/Bar',
             '/',
             '/path/to/foo-bar/other/' // no trailing slash
         );
@@ -112,7 +85,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
         $expect = "/src/ShowController.php";
         $actual = transform(
             '\\Acme\\Blog\\ShowController.php',
-            '\\Acme\\Blog\\',
+            '\\Acme\\Blog',
             '\\',
             '/src/'
         );

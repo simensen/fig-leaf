@@ -49,6 +49,9 @@ directory separator, thereby indicating a file or a partial directory name.
 Given a fully qualified logical path, a logical path prefix, a logical
 separator, and a file system path prefix, implementations:
 
+- MUST append a logical separator to the logical path prefix when one is not
+  present,
+  
 - MUST replace the logical path prefix with the file system path prefix, and
 
 - MUST replace logical path separators in the logical path suffix with
@@ -87,7 +90,7 @@ function transform(
     $logical_prefix = rtrim($logical_prefix, $logical_sep)
                     . $logical_sep;
     
-    // find the logical suffix 
+    // find the logical suffix
     $logical_suffix = substr($logical_path, strlen($logical_prefix));
     
     // transform into a file system path
