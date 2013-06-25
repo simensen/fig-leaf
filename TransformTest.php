@@ -19,6 +19,11 @@ function transform(
     // find the logical suffix 
     $logical_suffix = substr($logical_path, strlen($logical_prefix));
     
+    if ($logical_prefix !== substr($logical_path, 0, strlen($logical_prefix))) {
+        // ensure that partial matches will not be made
+        return false;
+    }
+    
     // transform into a file system path
     return $base_path
          . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix);
@@ -26,6 +31,18 @@ function transform(
 
 class TransformTest extends PHPUnit_Framework_TestCase
 {
+    public function testCannotTranformPartialLogicalPrefix()
+    {
+        $actual = transform(
+            ':Foo:Bar',
+            ':F',
+            ':',
+            '/path/to/foo-bar/src'
+        );
+        
+        $this->assertFalse($actual);
+    }
+    
     public function testFqlpIsSameAsLogicalPathPrefix()
     {
         $actual = transform(
@@ -56,12 +73,12 @@ class TransformTest extends PHPUnit_Framework_TestCase
     
     public function testClassName()
     {
-        $expect = "/path/to/foo-bar/src/Baz/Qux.php";
+        $expect = "/path/to/foo-bar/srcBaz/Qux.php";
         $actual = transform(
             '\Foo\Bar\Baz\Qux',
             '\Foo\Bar\\',
             '\\',
-            '/path/to/foo-bar/src/'
+            '/path/to/foo-bar/src'
         ) . '.php';
         $this->assertSame($expect, $actual);
     }
