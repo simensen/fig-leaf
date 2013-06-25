@@ -124,5 +124,17 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '/src/'
         );
         $this->assertSame($expect, $actual);
+    }
+
+    public function testInvalidLogicalPrefix()
+    {
+        $expect = null;
+        $actual = transform(
+            '\\Foo\\Bar\\Baz.php',
+            '\\F',
+            '\\',
+            '/src/'
+        );
+        $this->assertSame($expect, $actual);
    }
 }
