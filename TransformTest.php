@@ -16,10 +16,6 @@ function transform(
     $logical_sep,
     $base_path
 ) {
-    // make sure the logical prefix ends in a separator
-    $logical_prefix = rtrim($logical_prefix, $logical_sep)
-                    . $logical_sep;
-    
     // find the logical suffix 
     $logical_suffix = substr($logical_path, strlen($logical_prefix));
     
@@ -30,12 +26,26 @@ function transform(
 
 class TransformTest extends PHPUnit_Framework_TestCase
 {
+    public function testFqlpIsSameAsLogialPathPrefix()
+    {
+        $actual = transform(
+            ':Foo:Bar',
+            ':Foo:Bar',
+            ':',
+            '/path/to/foo-bar/src'
+        );
+        
+        $expect = '/path/to/foo-bar/src';
+        
+        $this->assertSame($expect, $actual);
+    }
+    
     public function testClassName()
     {
         $expect = "/path/to/foo-bar/src/Baz/Qux.php";
         $actual = transform(
             '\Foo\Bar\Baz\Qux',
-            '\Foo\Bar',
+            '\Foo\Bar\\',
             '\\',
             '/path/to/foo-bar/src/'
         ) . '.php';
@@ -47,7 +57,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
         $expect = "/path/to/foo-bar/resources/Baz/Qux.yml";
         $actual = transform(
             ':Foo:Bar:Baz:Qux.yml',
-            ':Foo:Bar',
+            ':Foo:Bar:',
             ':',
             '/path/to/foo-bar/resources/'
         );
@@ -59,7 +69,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
         $expect = "/path/to/foo-bar/other/Baz/Qux";
         $actual = transform(
             '/Foo/Bar/Baz/Qux',
-            '/Foo/Bar',
+            '/Foo/Bar/',
             '/',
             '/path/to/foo-bar/other/' // no trailing slash
         );
@@ -71,7 +81,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
         $expect = "/src/ShowController.php";
         $actual = transform(
             '\\Acme\\Blog\\ShowController.php',
-            '\\Acme\\Blog',
+            '\\Acme\\Blog\\',
             '\\',
             '/src/'
         );
