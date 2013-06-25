@@ -46,10 +46,10 @@ class TransformTest extends PHPUnit_Framework_TestCase
             ':Foo:Bar',
             ':',
             ':',
-            '/'
+            '/path/to/root/'
         );
         
-        $expect = '/Foo/Bar';
+        $expect = '/path/to/root/Foo/Bar';
         
         $this->assertSame($expect, $actual);
     }
