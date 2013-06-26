@@ -1,9 +1,9 @@
-PSR-T: Transformation Of Logical Paths To File System Paths
-===========================================================
+PSR-T: Transformation Of Logical Paths To File Paths
+====================================================
 
-This document describes an algorithm to transforms a logical path to a file
-system path. Among other things, this general-purpose tranformation algorithm
-allows mapping of class names and other resource names to file system paths.
+This document describes an algorithm to transform a logical resource path to
+a file path in a file system. Among other things, the algorithm allows
+transformation of class names and other logical resource names to file names.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -18,46 +18,54 @@ example, a slash, backslash, colon, etc.
 
 **Logical Segment**: A string delimited by _logical separators_.
 
-**Fully Qualified Logical Path**: A _logical separator_ followed by zero or
+**Fully Qualified Logical Path**: A _logical separator_ followed by one or
 more _logical segments_ delimited by _logical separators_. Given a _logical
-separator_ of "/", then `/`, `/Foo`, and `/Foo/Bar` are _fully
-qualified logical paths_.
+separator_ of ":", then `:Foo`, `:Foo:Bar`, and `:Foo:Bar:Baz` are _fully
+qualified logical paths_. (The _fully qualified logical path_ will be
+transformed into a file path in the file system.)
 
 **Logical Path Prefix**: A _logical path prefix_ is any contiguous series of
 _logical separators_ and _logical segments_ at the beginning of a
 _fully qualified logical path_, terminating in a _logical separator_. For
-example, given a _logical separator_ of "/", then `/`, `/Foo/`, and `/Foo/Bar/`
+example, given a _logical separator_ of ":", then `:Foo:`, and `:Foo:Bar:`
 are _logical path prefixes_ for a _fully qualified logical path_ of
-`/Foo/Bar/Baz`.
+`:Foo:Bar:Baz`. (The _logical path prefix_ is associated with a _directory
+path prefix_ in the file system.)
 
 **Logical Path Suffix**: Given a _fully qualified logical path_ and a
 _logical path prefix_, the _logical path suffix_ is the remainder of the
 _fully qualified logical path_ after the _logical path prefix_. For example,
-given a _logical separator_ of "/", a _fully qualified logical path_ of
-`/Foo/Bar/Baz/Qux`, and a _logical path prefix_ of `/Foo/Bar/`, then `Baz/Qux`
+given a _logical separator_ of ":", a _fully qualified logical path_ of
+`:Foo:Bar:Baz:Qux`, and a _logical path prefix_ of `:Foo:Bar:`, then `Baz:Qux`
 is the _logical path suffix_.
 
-**File System Path Prefix**: A leading path in the file system associated with
-a _logical path prefix_. The _file system path prefix_ MAY end with a directory
-separator, thereby referring to a directory; or, it MAY NOT end with a
-directory separator, thereby indicating a file or a partial directory name.
+**Directory Path Prefix**: A directory path in the file system associated with
+a _logical path prefix_. The _directory path prefix_ must terminate in a
+directory separator.
 
 
 2. Specification
 ----------------
 
 Given a fully qualified logical path, a logical path prefix, a logical
-separator, and a file system path prefix, implementations:
+separator, and a directory path prefix, implementations MUST transform the
+fully qualified logical path into a file path that MAY exist in the file
+system. To do so, implementations:
 
 - MUST append a logical separator to the logical path prefix when one is not
   present,
   
-- MUST replace the logical path prefix with the file system path prefix, and
+- MUST append a director separator to the directory path prefix when one is
+  not present,
+  
+- MUST replace the logical path prefix in the fully qualified logical path 
+  with the directory path prefix, and
 
 - MUST replace logical path separators in the logical path suffix with
-  directory separators.
+  directory separators, and
 
-The result is a file system path that MAY exist.
+- MUST return the transformed string; if the transformation fails, the
+  implementation MAY return false.
 
 
 3. Example Implementation
@@ -75,26 +83,34 @@ differ in how they are implemented.
  * Note that this is only an example, and is not a specification in itself.
  * 
  * @param string $logical_path The logical path to transform.
- * @param string $logical_prefix The logical prefix associated with $fs_prefix.
+ * @param string $logical_prefix The logical prefix associated with $dir_prefix.
  * @param string $logical_sep The logical separator in the logical path.
- * @param string $fs_prefix The file system path prefix for the transformation.
- * @return string The logical path transformed into a file system path.
+ * @param string $dir_prefix The directory path prefix for the transformation.
+ * @return string The logical path transformed into a file path.
  */
 function transform(
     $logical_path,
     $logical_prefix,
     $logical_sep,
-    $fs_prefix
+    $dir_prefix
 ) {
-    // make sure the logical prefix ends in a separator
-    $logical_prefix = rtrim($logical_prefix, $logical_sep)
-                    . $logical_sep;
+    // make sure the logical prefix has a trailing separator
+    $logical_prefix = rtrim($logical_prefix, $logical_sep) . $logical_sep;
+    
+    // make sure the base dir has a trailing separator
+    $dir_prefix = rtrim($dir_prefix, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    
+    // does the logical path actually have the logical prefix?
+    $prefix_len = strlen($logical_prefix);
+    if (substr($logical_path, 0, $prefix_len) != $logical_prefix) {
+        return false;
+    }
     
     // find the logical suffix
-    $logical_suffix = substr($logical_path, strlen($logical_prefix));
+    $logical_suffix = substr($logical_path, $prefix_len);
     
     // transform into a file system path
-    return $fs_prefix
+    return $dir_prefix
          . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix);
 }
 ```

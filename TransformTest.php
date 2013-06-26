@@ -5,26 +5,34 @@
  * Note that this is only an example, and is not a specification in itself.
  * 
  * @param string $logical_path The logical path to transform.
- * @param string $logical_prefix The logical prefix associated with $base_path.
+ * @param string $logical_prefix The logical prefix associated with $dir_prefix.
  * @param string $logical_sep The logical separator in the logical path.
- * @param string $base_path The base path for the transformation.
- * @return string The logical path transformed into a file system path.
+ * @param string $dir_prefix The directory path prefix for the transformation.
+ * @return string The logical path transformed into a file path.
  */
 function transform(
     $logical_path,
     $logical_prefix,
     $logical_sep,
-    $base_path
+    $dir_prefix
 ) {
-    // make sure the logical prefix ends in a logical separator
-    $logical_prefix = rtrim($logical_prefix, $logical_sep)
-                    . $logical_sep;
-                    
-    // find the logical suffix 
-    $logical_suffix = substr($logical_path, strlen($logical_prefix));
+    // make sure the logical prefix has a trailing separator
+    $logical_prefix = rtrim($logical_prefix, $logical_sep) . $logical_sep;
+    
+    // make sure the base dir has a trailing separator
+    $dir_prefix = rtrim($dir_prefix, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    
+    // does the logical path actually have the logical prefix?
+    $prefix_len = strlen($logical_prefix);
+    if (substr($logical_path, 0, $prefix_len) != $logical_prefix) {
+        return false;
+    }
+    
+    // find the logical suffix
+    $logical_suffix = substr($logical_path, $prefix_len);
     
     // transform into a file system path
-    return $base_path
+    return $dir_prefix
          . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix);
 }
 
@@ -36,7 +44,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
             ':Foo:Bar',
             ':',
             ':',
-            '/path/to/root/'
+            '/path/to/root'
         );
         
         $expect = '/path/to/root/Foo/Bar';
@@ -46,7 +54,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
     
     public function testClassName()
     {
-        $expect = "/path/to/foo-bar/srcBaz/Qux.php";
+        $expect = "/path/to/foo-bar/src/Baz/Qux.php";
         $actual = transform(
             '\Foo\Bar\Baz\Qux',
             '\Foo\Bar',
@@ -60,27 +68,27 @@ class TransformTest extends PHPUnit_Framework_TestCase
     {
         $expect = "/path/to/foo-bar/resources/Baz/Qux.yml";
         $actual = transform(
-            ':Foo:Bar:Baz:Qux.yml',
+            ':Foo:Bar:Baz:Qux',
             ':Foo:Bar',
             ':',
             '/path/to/foo-bar/resources/'
-        );
+        ) . '.yml';
         $this->assertSame($expect, $actual);
     }
     
-    public function testDirectoryName()
+    public function testOtherName()
     {
         $expect = "/path/to/foo-bar/other/Baz/Qux";
         $actual = transform(
             '/Foo/Bar/Baz/Qux',
             '/Foo/Bar',
             '/',
-            '/path/to/foo-bar/other/' // no trailing slash
+            '/path/to/foo-bar/other'
         );
         $this->assertSame($expect, $actual);
     }
     
-    public function testBSPrefix()
+    public function testBSPrefixWithFileExtension()
     {
         $expect = "/src/ShowController.php";
         $actual = transform(
@@ -94,26 +102,24 @@ class TransformTest extends PHPUnit_Framework_TestCase
     
     public function testBSDirectory()
     {
-        $expect = "/src/";
         $actual = transform(
             '\\Acme\\Blog',
             '\\Acme\\Blog',
             '\\',
             '/src/'
         );
-        $this->assertSame($expect, $actual);
+        $this->assertFalse($actual);
     }
     
-    public function testBSFile()
+    public function testBSFileAsPrefix()
     {
-        $expect = "/src/ShowController.php";
         $actual = transform(
             '\\Acme\\Blog\\ShowController.php',
             '\\Acme\\Blog\\ShowController.php',
             '\\',
-            '/src/ShowController.php' // no trailing slash
+            '/src/ShowController.php'
         );
-        $this->assertSame($expect, $actual);
+        $this->assertFalse($actual);
     }
     
     public function testBSRoot()
