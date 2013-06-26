@@ -21,12 +21,12 @@ _logical path prefix_.
 2. Specification
 ----------------
 
-Given a fully qualified logical path, a collection of prefix mappings, and a logical
-separator, implementations MUST attempt to find a readable file in the file
-system that matches the file name.
+Given a fully qualified logical path, a collection of prefix mappings, and a
+logical separator, the implementation MUST attempt to find one or more
+readable files in the file system that match the transformation result.
 
 - The implementation SHOULD attempt all possible transformations of the fully
-  qualified logical path into a a file name using the collection of prefix
+  qualified logical path into a file name using the collection of prefix
   mappings. When doing so, the implementation:
   
     - MUST try each possible logical path prefix in the fully qualified
@@ -55,12 +55,6 @@ system that matches the file name.
 - If the implementation did not match any file names, it MUST return an empty
   value, such as a boolean false or an array with no elements.
 
-
-2. Package
-----------
-
-The test suite to verify a path macher implementation is provided as part of the
-psr/path-matching package.
 
 3. Example Implementation
 -------------------------
