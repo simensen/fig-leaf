@@ -1,9 +1,9 @@
-PSR-T: Transformation Of Logical Paths To File Paths
-====================================================
+PSR-T: Transformation Of Logical Paths To File System Paths
+===========================================================
 
-This document describes an algorithm to transform a logical resource path to
-a file path in a file system. Among other things, the algorithm allows
-transformation of class names and other logical resource names to file names.
+This document describes an algorithm to transform a logical resource path to a
+file system path. Among other things, the algorithm allows transformation of
+class names and other logical resource names to file names.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -22,7 +22,7 @@ example, a slash, backslash, colon, etc.
 more _logical segments_ delimited by _logical separators_. Given a _logical
 separator_ of ":", then `:Foo`, `:Foo:Bar`, and `:Foo:Bar:Baz` are _fully
 qualified logical paths_. (The _fully qualified logical path_ will be
-transformed into a file path in the file system.)
+transformed into a file system path.)
 
 **Logical Path Prefix**: A _logical path prefix_ is any contiguous series of
 _logical separators_ and _logical segments_ at the beginning of a
@@ -49,7 +49,7 @@ directory separator.
 
 Given a fully qualified logical path, a logical path prefix, a logical
 separator, and a directory path prefix, implementations MUST transform the
-fully qualified logical path into a file path that MAY exist in the file
+fully qualified logical path into a path that MAY exist in the file
 system. To do so, implementations:
 
 - MUST append a logical separator to the logical path prefix when one is not

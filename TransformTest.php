@@ -88,6 +88,18 @@ class TransformTest extends PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
     }
     
+    public function testDirectoryName()
+    {
+        $expect = "/path/to/foo-bar/other/Baz/Qux/";
+        $actual = transform(
+            '/Foo/Bar/Baz/Qux',
+            '/Foo/Bar',
+            '/',
+            '/path/to/foo-bar/other'
+        ) . '/';
+        $this->assertSame($expect, $actual);
+    }
+    
     public function testBSPrefixWithFileExtension()
     {
         $expect = "/src/ShowController.php";
