@@ -1,8 +1,8 @@
 PSR-M: Matching Logical Paths To File Paths
 ===========================================
 
-This document describes an algorithm to match a logical resource path to a
-file path in a file system.
+This document describes an algorithm to match a logical resource path to one
+or more file paths in a file system.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
