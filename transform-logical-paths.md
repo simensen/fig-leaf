@@ -26,10 +26,10 @@ transformed into a file path in the file system.)
 
 **Logical Path Prefix**: A _logical path prefix_ is any contiguous series of
 _logical separators_ and _logical segments_ at the beginning of a
-_fully qualified logical path_, terminating in a _logical separator_. For
-example, given a _logical separator_ of ":", then `:Foo:`, and `:Foo:Bar:`
-are _logical path prefixes_ for a _fully qualified logical path_ of
-`:Foo:Bar:Baz`. (The _logical path prefix_ is associated with a _directory
+_fully qualified logical path_, beginning and ending with a _logical separator_.
+For example, given a _logical separator_ of ":", then `:`, `:Foo:`, and
+`:Foo:Bar:` are _logical path prefixes_ for a _fully qualified logical path_
+of `:Foo:Bar:Baz`. (The _logical path prefix_ is associated with a _directory
 path prefix_ in the file system.)
 
 **Logical Path Suffix**: Given a _fully qualified logical path_ and a
