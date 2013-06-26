@@ -52,12 +52,12 @@ separator, and a directory path prefix, implementations MUST transform the
 fully qualified logical path into a path that MAY exist in the file
 system. To do so, implementations:
 
-- MUST append a logical separator to the logical path prefix when one is not
-  present,
+- If the logical path prefix does not end in a logical separator, the
+  implementation MUST append one.
   
-- MUST append a director separator to the directory path prefix when one is
-  not present,
-  
+- If the directory path prefix does not end in a directory separator, the
+  implementation MUST append one.
+
 - MUST replace the logical path prefix in the fully qualified logical path 
   with the directory path prefix, and
 
