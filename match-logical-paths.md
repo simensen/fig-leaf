@@ -35,11 +35,11 @@ readable files in the file system that match the transformation result.
     - MUST try each directory path prefix in the prefix mapping for the
       logical path prefix, in order from first to last.
 
-- The implementation MAY modify the file name.
-
 - For each file name resulting from transformation, the implementation MUST
   determine if the file name is readable from the file system.
   
+    - The implementation MAY modify the file name.
+
     - If the file name is readable, the implementation MAY return the matched
       file name immediately, thereby exiting this algorithm; otherwise, the
       implementation MUST retain the matched file name for later return.
