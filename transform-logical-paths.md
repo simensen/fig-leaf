@@ -88,13 +88,13 @@ suffix_.
 
 **File System Path Base**: A file system path on which a transformation is
 based. If the _file system path base_ represents a directory the trailing
-directory separator SHOULD be omitted.
+directory separator MUST be omitted.
 
 > By not specifying this having anything to do with directories we open up
-> the ability to transform full paths, not just prefixes. We recommend
-> (SHOULD) that users never specify file system path base with a trailing
-> slash, even for directories, but we can leave this fuzzy if it is desired
-> to be so. I'd be just as happy changing SHOULD to MUST. :)
+> the ability to transform full paths, not just "prefixes." So we lose being
+> able to specify "/src/" over "/src", but get a lot of simplicity by requiring
+> the user to specify conforming paths and not requiring each implementation
+> to try and sanitize input in the same way.
 
 
 2. Specification
@@ -103,12 +103,6 @@ directory separator SHOULD be omitted.
 Given a _source_, a _logical path base_, a _logical separator_, and a _file
 system path base_, implementations MUST transform the _source_ into _output_.
 To do so, implementations:
-
-- MUST remove any trailing directory separators from the _file system
-  path base_.
-
-> Allow for flexibility in specifying the file system path base for directories
-> both with and without a trailing slash.
 
 - MUST immediately return the _file system path base_ if the _source_ is equal
   to the _logical path base_.
@@ -170,10 +164,6 @@ function transform(
     $logical_sep,
     $fs_base
 ) {
-    // - MUST remove any trailing directory separators from the _file system
-    //   path base_.
-    $fs_base = rtrim($fs_base, DIRECTORY_SEPARATOR);
-
     if ($source === $logical_base) {
         // - MUST immediately return the _file system path base_ if the _source_
         //   is equal to the _logical path base_.

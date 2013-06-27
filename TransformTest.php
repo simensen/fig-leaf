@@ -16,27 +16,6 @@ function transform(
     $logical_sep,
     $fs_base
 ) {
-    // - MUST remove any trailing directory separators from the _file system
-    //   path base_.
-    //
-    // We do this early so that the following block can pass back _output_ that
-    // conforms to the definition of not including a trailing directory separator.
-    //
-    // We can also use this later when we append the logical suffix in that we
-    // can assume that we can just append a directory separator since $fs_base
-    // is "clean."
-    //
-    // This is a compromise; we could just as easily say that the _file system
-    // path base_ needs to always be specified without a trailing directory
-    // separator. This adds a little flexiblity at the expense of making sure
-    // every implemetnation does this.
-    //
-    // Essentially, this allows our existing code examples to work. If we wanted
-    // to make changes to those inputs (for example, "/src/" woudl be invalid
-    // and we'd have to change them to "/src") then we can remove this rule and
-    // this bit of code. I chose the path of perceived least resistence. :)
-    $fs_base = rtrim($fs_base, DIRECTORY_SEPARATOR);
-
     if ($source === $logical_base) {
         // The definition for the _logical path base_ says that it is a
         // _fully qualified logical path_ itself. This means that it is possible
@@ -63,7 +42,7 @@ function transform(
         //
         // Handles the following cases:
         //
-        //     transform(":Acme:Foo", ":Acme:Foo", ":", "/src/")
+        //     transform(":Acme:Foo", ":Acme:Foo", ":", "/src")
         //     // results in "/src"
         //
         //     transform(":Acme:Foo:Bar.txt", ":Acme:Foo:Bar.txt", "/src/acme-foo-bar.txt")
@@ -162,7 +141,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
             ':Foo:Bar:Baz:Qux',
             ':Foo:Bar',
             ':',
-            '/path/to/foo-bar/resources/'
+            '/path/to/foo-bar/resources'
         ) . '.yml';
         $this->assertSame($expect, $actual);
     }
@@ -198,7 +177,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '\\Acme\\Blog\\ShowController.php',
             '\\Acme\\Blog',
             '\\',
-            '/src/'
+            '/src'
         );
         $this->assertSame($expect, $actual);
     }
@@ -210,7 +189,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '\\Acme\\Blog',
             '\\Acme\\Blog',
             '\\',
-            '/src/'
+            '/src'
         );
         $this->assertSame($expect, $actual);
     }
@@ -234,7 +213,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '\\Acme\\Blog\\ShowController.php',
             '\\',
             '\\',
-            '/src/'
+            '/src'
         );
         $this->assertSame($expect, $actual);
     }
@@ -245,7 +224,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
             '\\Acme\\Blog',
             '\\Acme\\Blog\\Baz',
             '\\',
-            '/src/'
+            '/src'
         );
         $this->assertFalse($actual);
    }
