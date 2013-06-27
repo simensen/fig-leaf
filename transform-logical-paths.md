@@ -43,10 +43,11 @@ _root path_.
 > _fully qualified logical path_. Means we can talk about `source` in the
 > rules and definitions.
 
-**Output**: Either a string representing a file system path that MAY exist on
-disk or `false` if the transformation is unsuccessful.
+**Output**: A string representing a file system path that MAY exist on disk.
+The _output_ MUST NOT be terminated by a directory separator. If the
+transformation is unsuccessful the _output_ will be `false`.
 
-> Might as well define the output of the transformation.
+> Might as well define the output of the transformation while we are at it.
 
 **Logical Path Base**: A string containing a _fully qualified logical path_ from
 which transformation on the _source_ may be based. If the _logical path base_ is
@@ -87,10 +88,13 @@ suffix_.
 
 **File System Path Base**: A file system path on which a transformation is
 based. If the _file system path base_ represents a directory the trailing
-directory separator MAY be omitted.
+directory separator SHOULD be omitted.
 
 > By not specifying this having anything to do with directories we open up
-> the ability to transform full paths, not just prefixes.
+> the ability to transform full paths, not just prefixes. We recommend
+> (SHOULD) that users never specify file system path base with a trailing
+> slash, even for directories, but we can leave this fuzzy if it is desired
+> to be so. I'd be just as happy changing SHOULD to MUST. :)
 
 
 2. Specification
@@ -100,7 +104,13 @@ Given a _source_, a _logical path base_, a _logical separator_, and a _file
 system path base_, implementations MUST transform the _source_ into _output_.
 To do so, implementations:
 
-- MUST immediately return the _base file system path_ if the _source_ is equal
+- MUST remove any trailing directory separators from the _file system
+  path base_.
+
+> Allow for flexibility in specifying the file system path base for directories
+> both with and without a trailing slash.
+
+- MUST immediately return the _file system path base_ if the _source_ is equal
   to the _logical path base_.
 
 > This handles the following cases:
@@ -118,8 +128,7 @@ To do so, implementations:
 > invalid input is encountered. If the above sometimes returns false and
 > sometimes a *very wrong path*, we lost consistency.
 
-- MUST append a directory to the _file system path base_ if one does not already
-  exist, and
+- MUST append a directory to the _file system path base_, and
 
 > We can be fuzzy on this because at the point that we would ever get to this
 > rule we know that the _file system path base_ is going to be a directory.
@@ -161,6 +170,10 @@ function transform(
     $logical_sep,
     $fs_base
 ) {
+    // - MUST remove any trailing directory separators from the _file system
+    //   path base_.
+    $fs_base = rtrim($fs_base, DIRECTORY_SEPARATOR);
+
     if ($source === $logical_base) {
         // - MUST immediately return the _file system path base_ if the _source_
         //   is equal to the _logical path base_.
@@ -187,9 +200,8 @@ function transform(
     // find the logical suffix
     $logical_suffix = substr($source, strlen($logical_base));
 
-    // - MUST append a directory to the _file system path base_ if one does not
-    //   already exist, and
-    $fs_base = rtrim($fs_base, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    // - MUST append a directory to the _file system path base_, and
+    $fs_base = $fs_base . DIRECTORY_SEPARATOR;
     
     // transform into a file system path
     return $fs_base

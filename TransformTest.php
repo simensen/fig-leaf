@@ -16,6 +16,27 @@ function transform(
     $logical_sep,
     $fs_base
 ) {
+    // - MUST remove any trailing directory separators from the _file system
+    //   path base_.
+    //
+    // We do this early so that the following block can pass back _output_ that
+    // conforms to the definition of not including a trailing directory separator.
+    //
+    // We can also use this later when we append the logical suffix in that we
+    // can assume that we can just append a directory separator since $fs_base
+    // is "clean."
+    //
+    // This is a compromise; we could just as easily say that the _file system
+    // path base_ needs to always be specified without a trailing directory
+    // separator. This adds a little flexiblity at the expense of making sure
+    // every implemetnation does this.
+    //
+    // Essentially, this allows our existing code examples to work. If we wanted
+    // to make changes to those inputs (for example, "/src/" woudl be invalid
+    // and we'd have to change them to "/src") then we can remove this rule and
+    // this bit of code. I chose the path of perceived least resistence. :)
+    $fs_base = rtrim($fs_base, DIRECTORY_SEPARATOR);
+
     if ($source === $logical_base) {
         // The definition for the _logical path base_ says that it is a
         // _fully qualified logical path_ itself. This means that it is possible
@@ -24,7 +45,7 @@ function transform(
         //
         // In the specification we have a rule:
         //
-        // - MUST immediately return the _base file system path_ if the _source_
+        // - MUST immediately return the _file system path base_ if the _source_
         //   is equal to the _logical path base_.
         //
         // This can be seen as useful for two reasons.
@@ -42,8 +63,11 @@ function transform(
         //
         // Handles the following cases:
         //
-        //     transform(":Acme:Foo", ":Acme:Foo", ":", "/src/");
-        //     transform(":Acme:Foo:Bar.txt", ":Acme:Foo:Bar.txt", "/src/acme-foo-bar.txt");
+        //     transform(":Acme:Foo", ":Acme:Foo", ":", "/src/")
+        //     // results in "/src"
+        //
+        //     transform(":Acme:Foo:Bar.txt", ":Acme:Foo:Bar.txt", "/src/acme-foo-bar.txt")
+        //     // results in "/src/acme-foo-bar.txt"
         //
         return $fs_base;
     }
@@ -86,8 +110,7 @@ function transform(
     // find the logical suffix
     $logical_suffix = substr($source, strlen($logical_base));
 
-    // - MUST append a directory to the _file system path base_ if one does not
-    //   already exist, and
+    // - MUST append a directory to the _file system path base_, and
     //
     // If we get to this point, we for sure have a logical suffix that is not an
     // empty string so we can safely assume that the fs_base should be
@@ -97,8 +120,8 @@ function transform(
     // that this is the case, we have to do it at this point and cannot do this
     // earlier. Further, we can't make this assumption *at all* without most
     // or all of the extra processing and checks above.
-    $fs_base = rtrim($fs_base, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-    
+    $fs_base = $fs_base . DIRECTORY_SEPARATOR;
+
     // transform into a file system path
     return $fs_base
          . str_replace($logical_sep, DIRECTORY_SEPARATOR, $logical_suffix);
@@ -158,13 +181,13 @@ class TransformTest extends PHPUnit_Framework_TestCase
     
     public function testDirectoryName()
     {
-        $expect = "/path/to/foo-bar/other/Baz/Qux/";
+        $expect = "/path/to/foo-bar/other/Baz/Qux";
         $actual = transform(
             '/Foo/Bar/Baz/Qux',
             '/Foo/Bar',
             '/',
             '/path/to/foo-bar/other'
-        ) . '/';
+        );
         $this->assertSame($expect, $actual);
     }
     
@@ -182,7 +205,7 @@ class TransformTest extends PHPUnit_Framework_TestCase
     
     public function testBSDirectory()
     {
-        $expect = "/src/";
+        $expect = "/src";
         $actual = transform(
             '\\Acme\\Blog',
             '\\Acme\\Blog',
